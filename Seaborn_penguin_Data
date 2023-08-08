@@ -1,1 +1,161 @@
+#!/usr/bin/env python
+# coding: utf-8
+
+# In[3]:
+
+
+import numpy as np
+import seaborn as sns
+from sklearn.preprocessing import LabelEncoder
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
+from sklearn.metrics import accuracy_score
+from sklearn.linear_model import LogisticRegression
+from sklearn.impute import SimpleImputer
+
+
+# In[4]:
+
+
+varPen = sns.load_dataset("penguins")
+
+
+# In[5]:
+
+
+varPen.sample(10)
+
+
+# In[16]:
+
+
+Species = LabelEncoder()
+Species.fit(varPen['species'])
+varPen['species'] = Species.transform(varPen['species'])
+
+island = LabelEncoder()
+island.fit(varPen['island'])
+varPen['island'] = island.transform(varPen['island'])
+
+Sex = LabelEncoder()
+Sex.fit(varPen['sex'])
+varPen['sex'] = Sex.transform(varPen['sex'])
+
+
+# In[17]:
+
+
+
+imputer= SimpleImputer(missing_values =np.nan, strategy='mean')  
+
+#Fitting imputer object to the independent varibles x.   
+imputer.fit(varPen[['bill_length_mm','bill_depth_mm','flipper_length_mm','body_mass_g']])  
+  
+#Replacing missing data with the calculated mean value  
+#varPen= imputer.transform(varPen[['bill_length_mm','bill_depth_mm','flipper_length_mm','body_mass_g']])  
+varPen[['bill_length_mm','bill_depth_mm','flipper_length_mm','body_mass_g']]= imputer.transform(varPen[['bill_length_mm','bill_depth_mm','flipper_length_mm','body_mass_g']])  
+#varPen['body_mass_g']= imputer.transform(varPen[['body_mass_g']])  
+
+
+# In[18]:
+
+
+varPen.isna().any()
+
+
+# In[20]:
+
+
+imputerSex = SimpleImputer(missing_values =np.nan, strategy='mode')  
+imputer.fit(varPen[['sex']])
+varPen[['sex']]= imputer.transform(varPen[['sex']])
+
+
+# In[21]:
+
+
+varPen
+
+
+# In[30]:
+
+
+X = varPen[['species','bill_length_mm','bill_depth_mm','flipper_length_mm','body_mass_g','sex']]
+Y = varPen['island']
+
+
+# In[31]:
+
+
+X_train, X_test, y_train, y_test = train_test_split(X,Y,test_size=.2)
+
+
+# In[32]:
+
+
+varRandomForest = RandomForestClassifier()
+
+
+# In[33]:
+
+
+varRandomForest.fit(X_train,y_train)
+
+
+# In[34]:
+
+
+pred_Y =varRandomForest.predict(X_test)
+
+
+# In[35]:
+
+
+accuracy_score(y_test,pred_Y)
+
+
+# In[36]:
+
+
+modelAdaboost = AdaBoostClassifier()
+modelAdaboost.fit(X_train,y_train)
+
+
+# In[37]:
+
+
+predadaboost = modelAdaboost.predict(X_test)
+predadaboost
+
+
+# In[39]:
+
+
+accuracy_score(y_test,predadaboost)
+
+
+# In[41]:
+
+
+LogisticModel = LogisticRegression()
+LogisticModel.fit(X_train,y_train)
+
+
+# In[42]:
+
+
+predLR = LogisticModel.predict(X_test)
+
+
+# In[43]:
+
+
+accuracy_score(y_test,predLR)
+
+
+# In[ ]:
+
+
+
+
 
